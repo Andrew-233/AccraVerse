@@ -125,6 +125,61 @@ const armL=playerPart(new THREE.CapsuleGeometry(.09,.48,3,6),skin,-.42,1.35,0);
 const armR=playerPart(new THREE.CapsuleGeometry(.09,.48,3,6),skin,.42,1.35,0);
 player.position.set(0,0,4);
 
+// First enterable location: a small provision shop interior.
+const shopInterior = new THREE.Group();
+scene.add(shopInterior);
+const shopMat = (color, roughness=.85) => new THREE.MeshStandardMaterial({color, roughness});
+const shopFloor = shopMat(0xbda783), shopWall = shopMat(0xe6d7b7), shopTrim = shopMat(0x4d7772);
+const shelfMat = shopMat(0x805a3c), productMats = [shopMat(0xe6ad48),shopMat(0x4f8a78),shopMat(0xc98160),shopMat(0x729da7)];
+function shopBox(w,h,d,mat,x,y,z){const o=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;shopInterior.add(o);return o;}
+shopBox(12,.2,12,shopFloor,0,-.12,0);
+shopBox(12,4,.2,shopWall,0,1.9,-6);
+shopBox(.2,4,12,shopWall,-6,1.9,0);
+shopBox(.2,4,12,shopWall,6,1.9,0);
+// Front wall is split to leave an open doorway.
+shopBox(3.5,4,.2,shopWall,-4.25,1.9,6);
+shopBox(3.5,4,.2,shopWall,4.25,1.9,6);
+shopBox(5,.25,.25,shopTrim,0,3.8,5.9);
+for(const z of [-3,0,3]){
+ shopBox(2.7,.18,.7,shelfMat,-3.8,1.1,z);
+ shopBox(2.7,.18,.7,shelfMat,-3.8,2.1,z);
+ for(let i=0;i<4;i++){
+  shopBox(.38,.48,.38,productMats[(i+Math.abs(z))%productMats.length],-4.7+i*.6,1.42,z);
+  shopBox(.38,.48,.38,productMats[(i+1+Math.abs(z))%productMats.length],-4.7+i*.6,2.42,z);
+ }
+}
+shopBox(3,.95,1.1,shelfMat,2.5,.48,-2);
+shopBox(2.7,.12,.9,shopTrim,2.5,1.02,-2);
+shopBox(1.7,.9,.5,shelfMat,2.5,.48,2);
+shopBox(1.2,.08,.4,shopMat(0xf3e6bd),2.5,.97,2);
+const shopSign = shopBox(3,.65,.12,shopTrim,0,3.2,-5.82);
+const exteriorObjects = scene.children.filter(o => o !== player && o !== shopInterior && !o.isLight);
+const enterButton = document.querySelector('#enter-button');
+let insideShop = false;
+function setShopInterior(enter){
+ insideShop=enter;
+ exteriorObjects.forEach(o=>o.visible=!enter);
+ shopInterior.visible=enter;
+ player.visible=true;
+ if(enter){
+  player.position.set(0,0,3.5); yaw=0; camera.position.set(0,4,10);
+  enterButton.textContent='Exit shop';
+  showToast('Welcome! Explore the shop, then tap Exit shop.');
+ }else{
+  player.position.set(5.1,0,4); yaw=Math.PI;
+  enterButton.textContent='Enter shop';
+  showToast('You stepped back out onto the street.');
+ }
+}
+shopInterior.visible=false;
+enterButton.addEventListener('click',()=>setShopInterior(!insideShop));
+addEventListener('keydown',e=>{
+ if(e.key.toLowerCase()==='e' && !e.repeat){
+  if(insideShop) setShopInterior(false);
+  else if(Math.hypot(player.position.x-5.1,player.position.z-4)<2.8) setShopInterior(true);
+ }
+});
+
 const keys=new Set();
 addEventListener('keydown',e=>{keys.add(e.key.toLowerCase());if(['arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase()))e.preventDefault();});
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -177,12 +232,15 @@ function animate(){
   legL.rotation.x=Math.sin(performance.now()*.012)*.55*moving;
   legR.rotation.x=-legL.rotation.x;armL.rotation.x=-legL.rotation.x*.65;armR.rotation.x=-legR.rotation.x*.65;
  }else{legL.rotation.x=THREE.MathUtils.damp(legL.rotation.x,0,9,dt);legR.rotation.x=THREE.MathUtils.damp(legR.rotation.x,0,9,dt);armL.rotation.x=0;armR.rotation.x=0}
- player.position.x=THREE.MathUtils.clamp(player.position.x,-6.2,6.2);
- player.position.z=THREE.MathUtils.clamp(player.position.z,-70,70);
+ player.position.x=THREE.MathUtils.clamp(player.position.x,insideShop?-5.1:-6.2,insideShop?5.1:6.2);
+ player.position.z=THREE.MathUtils.clamp(player.position.z,insideShop?-5.1:-70,insideShop?5.1:70);
  const behind=new THREE.Vector3(Math.sin(yaw)*7,4.1,Math.cos(yaw)*7);
  camera.position.lerp(player.position.clone().add(behind),1-Math.exp(-4*dt));
  camera.lookAt(player.position.x,player.position.y+1.35,player.position.z);
- document.querySelector('#district').textContent=Math.abs(player.position.z)<18?'OSU DISTRICT':player.position.z<0?'OXFORD STREET':'CANTONMENTS ROAD';
+ document.querySelector('#district').textContent=insideShop?'OSU PROVISION SHOP':Math.abs(player.position.z)<18?'OSU DISTRICT':player.position.z<0?'OXFORD STREET':'CANTONMENTS ROAD';
+ const nearShop=!insideShop && Math.hypot(player.position.x-5.1,player.position.z-4)<2.8;
+ enterButton.hidden=!insideShop&&!nearShop;
+ if(!insideShop && nearShop) enterButton.textContent='Enter shop';
  renderer.render(scene,camera);
 }
 animate();

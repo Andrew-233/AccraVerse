@@ -36,9 +36,9 @@ This is **Milestone 1: a local single-player prototype**. It is not yet a full r
 ## Tech
 - HTML, CSS, JavaScript
 - Three.js via CDN import map
-
+- Andrew Tech
 ## Project plan
 See [ROADMAP.md](./ROADMAP.md).
 
 ## Licence
-No licence has been selected yet. Add one before accepting outside contributions or distributing the game.
+No licence has been selected yet.

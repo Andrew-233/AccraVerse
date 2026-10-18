@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#101b25" />
+  <meta name="description" content="AccraVerse — an original Ghanaian open-world life simulator prototype." />
+  <title>AccraVerse | City Life Prototype</title>
+  <link rel="stylesheet" href="./src/style.css" />
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+  <main id="game">
+    <canvas id="world" aria-label="AccraVerse 3D game world"></canvas>
+    <section class="hud topbar">
+      <div class="brand"><span class="brand-mark">A</span><div><strong>ACCRAVERSE</strong><small>GHANA · CITY LIFE</small></div></div>
+      <div class="status"><span class="live-dot"></span> PROTOTYPE <span class="divider">|</span> <span id="clock">08:00</span></div>
+    </section>
+    <section class="hud welcome">
+      <p class="eyebrow">YOUR STORY STARTS HERE</p>
+      <h1>Welcome to <span>Accra.</span></h1>
+      <p class="sub">Explore the streets. Find your path. Build your life.</p>
+    </section>
+    <section class="hud objective"><span class="objective-icon">✦</span><div><small>YOUR FIRST MISSION</small><strong>Explore the neighbourhood</strong><p>Walk around and discover your new city.</p></div></section>
+    <div class="hud location"><span>◉</span> <span id="district">OSU DISTRICT</span></div>
+    <div class="hud controls-hint" id="desktop-hint">W A S D <span>MOVE</span> &nbsp; MOUSE <span>LOOK</span></div>
+    <div class="hud mobile-controls" id="mobile-controls">
+      <div class="stick" id="stick"><div class="stick-knob" id="stick-knob"></div></div>
+      <button id="look-left" aria-label="Look left">↶</button><button id="look-right" aria-label="Look right">↷</button>
+    </div>
+    <section class="hud bottom-panel">
+      <div class="avatar"><span>👤</span></div><div class="player-info"><small>RESIDENT</small><strong>New Citizen</strong><span>Level 1 · Fresh Start</span></div>
+      <div class="wallet"><small>YOUR CASH</small><strong>GH₵ <span id="cash">250</span></strong></div>
+      <button class="map-button" id="map-button" title="Show map overview">⌖</button>
+    </section>
+    <div class="hud toast" id="toast" role="status">Welcome to your new neighbourhood!</div>
+    <div class="hud crosshair" aria-hidden="true">+</div>
+    <div class="hud map-overlay" id="map-overlay"><div class="map-card"><button id="close-map" aria-label="Close map">×</button><p class="eyebrow">CITY GUIDE</p><h2>Osu District</h2><p>You're exploring a small, original prototype inspired by the energy and street life of Accra, Ghana.</p><div class="map-key"><span>●</span> You are here</div></div></div>
+  </main>
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
